@@ -26,11 +26,27 @@ app.use(express.json());
 app.get("/probando", (req, res) => {
     console.log("se haejecutado el endpoint prrobando");
 
-    return res.status(200).send({
-        curso: "master en react",
-        autor: "vicotr robles"
-    });
+    return res.status(200).send([
+        {
+            curso: "master en react",
+            autor: "vicotr robles"
+        },
+        {
+            curso: "master en react",
+            autor: "vicotr robles"
+        },
+
+    ]);
 });
+
+app.get("/", (req, res) => {
+    console.log("se haejecutado el endpoint prrobando");
+
+    return res.status(200).send(
+        "<h1>haciendo api con node</h1>"
+    );
+});
+
 
 
 
