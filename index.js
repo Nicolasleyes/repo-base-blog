@@ -1,5 +1,6 @@
 const { conexion } = require("./basedatos/conexion");
 const express = require("express");
+
 const cors = require("cors");
 
 
@@ -21,7 +22,20 @@ app.use(cors());
 //convertir body a objeto JS
 app.use(express.json());
 
-//crear Rutas
+
+// rutas
+
+const rutas_articulo = require("./rutas/articulosR");
+
+//cargar las rutas
+
+app.use("/api", rutas_articulo );
+
+console.log(typeof rutas_articulo);
+
+//rutas hrcodeadas
+
+
 
 app.get("/probando", (req, res) => {
     console.log("se haejecutado el endpoint prrobando");
