@@ -20,7 +20,9 @@ app.use(cors());
 
 
 //convertir body a objeto JS
-app.use(express.json());
+app.use(express.json()); //recibir datos con content type  app/json
+
+app.use(express.urlencoded({extended:true}));
 
 
 // rutas
