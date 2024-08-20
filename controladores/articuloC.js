@@ -63,8 +63,48 @@ const crear = async (req, res) => {
     }
 }
 
+
+
+const listar = async (req, res) => {
+    try {
+        // Ejecuta la consulta usando await y ordena por fecha descendente
+        let consulta = Articulo.find({});
+
+        consulta.limit
+                                
+        consulta.sort({ fecha: -1 });
+
+
+
+        const articulos = await consulta;
+
+        // Verifica si se encontraron artículos
+        if (!articulos.length) {
+            return res.status(404).json({
+                status: "error",
+                mensaje: "No se ha podido conseguir los artículos"
+            });
+        }
+
+        // Si se encontraron artículos, responde con éxito
+        return res.status(200).json({
+            status: "success",
+            articulos
+        });
+
+    } catch (error) {
+        // Manejo de errores en la consulta
+        return res.status(500).json({
+            status: "error",
+            mensaje: "Ocurrió un error al obtener los artículos"
+        });
+    }
+};
+
+
 module.exports = {
     prueba,
     curso,
-    crear
+    crear,
+    listar
 }
