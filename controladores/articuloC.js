@@ -1,3 +1,4 @@
+const fs =require("fs");
 const {validarArticulo} = require("../helper/validar");
 const Articulo = require("../modelos/Articulo");
 
@@ -219,22 +220,51 @@ const subir = (req, res) => {
 
     //recogerel ficherode imagen subida
 
-    console.log(req.file);
+    if(!req.file && !req.files){
+        return res.status(404).json({
+            status: "error",
+            mensaje: "peticion invalida"
+        })
+    }
 
     //conseguir el nombre de la imagen
 
+    let archivo = req.file.originalname;
+
     //extncion de archivo
+    let archivoSplit = archivo.split("\.");
+    
+    let extencion = archivoSplit[1];
+
 
     //comprobar extencion correcta
 
-    //si todo va bien , actiualizar  el articulo
+    if(extencion != "png" && extencion != "jpg"&&
+        extencion != "jpge" && extencion != "gif"){
+
+            //borrar archivo y dar respuesta
+
+            fs.unlink(req.file.path, (error) =>{
+                
+                return res.status(400).json({
+                    status: "error",
+                    mensaje: "archivo invalido"
+
+                });
+            });
+        }else{
+             //si todo va bien , actiualizar  el articulo
 
     //devolver respuesta
 
-    return res.status(200).json({
-        status: "success",
-        files: req.file
+        return res.status(200).json({
+            status: "success",
+            extencion,
+            files: req.file
     });
+        }
+
+   
 
 }
 
