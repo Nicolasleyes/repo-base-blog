@@ -1,4 +1,4 @@
-const validator = require("validator");
+const {validarArticulo} = require("../helper/validar");
 const Articulo = require("../modelos/Articulo");
 
 const prueba = (req, res) => {
@@ -22,25 +22,24 @@ const curso = (req, res) => {
     ]);
 };
 
+//metodo de crear
+
 const crear = async (req, res) => {
     // Recoger datos de POST a guardar
     let parametros = req.body;
 
     // Validar datos
-    try {
-        let validar_titulo = !validator.isEmpty(parametros.titulo) &&
-                             validator.isLength(parametros.titulo, { min: 5, max: undefined });
-        let validar_contenido = !validator.isEmpty(parametros.contenido);
 
-        if (!validar_titulo || !validar_contenido) {
-            throw new Error("No se ha validado la información");
-        }
+    try{
+        validarArticulo( parametros);
+
     } catch (error) {
-        return res.status(400).json({
-            status: "error",
-            mensaje: "Faltan datos por enviar"
-        });
-    }
+    return res.status(400).json({
+        status: "error",
+        mensaje: "Faltan datos por enviar"
+    });
+}
+    
 
     try {
         // Crear objeto a guardar
@@ -64,13 +63,19 @@ const crear = async (req, res) => {
 }
 
 
+//metodo para enlistar 
 
 const listar = async (req, res) => {
     try {
         // Ejecuta la consulta usando await y ordena por fecha descendente
         let consulta = Articulo.find({});
 
-        consulta.limit
+
+        if(req.params.ultimos ){
+            consulta.limit(3);
+        }
+
+        
                                 
         consulta.sort({ fecha: -1 });
 
@@ -89,6 +94,8 @@ const listar = async (req, res) => {
         // Si se encontraron artículos, responde con éxito
         return res.status(200).json({
             status: "success",
+            
+            contador: articulos.length,
             articulos
         });
 
@@ -102,9 +109,145 @@ const listar = async (req, res) => {
 };
 
 
+//metodo paraencontrar articulo por id
+
+
+const uno = async (req, res) => {
+    try {
+        // Recoger un id por la URL
+        let id = req.params.id;
+
+        // Buscar el artículo
+        const articulo = await Articulo.findById(id);
+
+        // Si no existe, devolver error
+       
+
+        // Si existe, devolver resultado
+        return res.status(200).json({
+            status: "success",
+            articulo
+        });
+    } catch (error) {
+        // Manejar error si la búsqueda falla
+        return res.status(500).json({
+            status: "error",
+            mensaje: "Error al buscar el artículo",
+            error: error.message
+        });
+    }
+};
+
+//metodo para borrar
+
+const borrar = async (req, res) => {
+    try {
+        let articuloId = req.params.id;
+
+        // Encuentra y borra el artículo
+        const articuloBorrado = await Articulo.findByIdAndDelete(articuloId);
+
+        
+
+        return res.status(200).json({
+            status: "success",
+            articulo: articuloBorrado,
+            mensaje: "Artículo borrado con éxito"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            mensaje: "Error al borrar el artículo"
+        });
+    }
+};
+
+
+const editar = async (req, res) => {
+    try {
+        // Recoger el id del artículo a editar
+        let articuloId = req.params.id;
+
+        // Recoger datos del body
+        let parametros = req.body;
+
+        // Validar datos
+        try{
+            validarArticulo( parametros);
+
+        } catch (error) {
+        return res.status(400).json({
+            status: "error",
+            mensaje: "Faltan datos por enviar"
+        });
+    }
+       
+
+        // Buscar y actualizar artículo
+        const articuloActualizado = await Articulo.findOneAndUpdate(
+            { _id: articuloId },
+            parametros,
+            { new: true }
+        );
+
+        if (!articuloActualizado) {
+            return res.status(404).json({
+                status: "error",
+                mensaje: "No se encontró el artículo para actualizar"
+            });
+        }
+
+        // Devolver respuesta
+        return res.status(200).json({
+            status: "success",
+            articulo: articuloActualizado
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "error",
+            mensaje: "Error al actualizar: " + error.message
+        });
+    }
+};
+
+
+
+const subir = (req, res) => {
+
+    //configurar multer
+
+    //recogerel ficherode imagen subida
+
+    console.log(req.file);
+
+    //conseguir el nombre de la imagen
+
+    //extncion de archivo
+
+    //comprobar extencion correcta
+
+    //si todo va bien , actiualizar  el articulo
+
+    //devolver respuesta
+
+    return res.status(200).json({
+        status: "success",
+        files: req.file
+    });
+
+}
+
+
+//modulo para exportar metodos 
+
 module.exports = {
     prueba,
     curso,
     crear,
-    listar
+    listar,
+    uno,
+    borrar,
+    editar,
+    subir
 }
