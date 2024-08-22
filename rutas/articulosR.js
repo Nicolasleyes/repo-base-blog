@@ -2,7 +2,7 @@
 
  const multer = require("multer");
 
- const ArticuloControlador = require("../controladores/articuloC");
+ const ArticuloControlador = require("../controladores/ArticuloC");
 
  const router = express.Router();
 
@@ -48,6 +48,9 @@ router.put("/articulo/:id", ArticuloControlador.editar);
 
 router.post("/subir-imagen/:id",[subidas.single("file0")], ArticuloControlador.subir);
 
+router.get("/imagen/:fichero", ArticuloControlador.imagen);
+
+router.get("/buscar/:busqueda", ArticuloControlador.buscador);
 
 
  module.exports = router;
