@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const {validarArticulo} = require("../helper/validar");
+const { validarArticulo } = require("../helper/validar");
 const Articulo = require("../modelos/Articulo");
 
 const prueba = (req, res) => {
@@ -32,16 +32,16 @@ const crear = async (req, res) => {
 
     // Validar datos
 
-    try{
-        validarArticulo( parametros);
+    try {
+        validarArticulo(parametros);
 
     } catch (error) {
-    return res.status(400).json({
-        status: "error",
-        mensaje: "Faltan datos por enviar"
-    });
-}
-    
+        return res.status(400).json({
+            status: "error",
+            mensaje: "Faltan datos por enviar"
+        });
+    }
+
 
     try {
         // Crear objeto a guardar
@@ -73,12 +73,12 @@ const listar = async (req, res) => {
         let consulta = Articulo.find({});
 
 
-        if(req.params.ultimos ){
+        if (req.params.ultimos) {
             consulta.limit(3);
         }
 
-        
-                                
+
+
         consulta.sort({ fecha: -1 });
 
 
@@ -96,7 +96,7 @@ const listar = async (req, res) => {
         // Si se encontraron artículos, responde con éxito
         return res.status(200).json({
             status: "success",
-            
+
             contador: articulos.length,
             articulos
         });
@@ -123,7 +123,7 @@ const uno = async (req, res) => {
         const articulo = await Articulo.findById(id);
 
         // Si no existe, devolver error
-       
+
 
         // Si existe, devolver resultado
         return res.status(200).json({
@@ -149,7 +149,7 @@ const borrar = async (req, res) => {
         // Encuentra y borra el artículo
         const articuloBorrado = await Articulo.findByIdAndDelete(articuloId);
 
-        
+
 
         return res.status(200).json({
             status: "success",
@@ -174,16 +174,16 @@ const editar = async (req, res) => {
         let parametros = req.body;
 
         // Validar datos
-        try{
-            validarArticulo( parametros);
+        try {
+            validarArticulo(parametros);
 
         } catch (error) {
-        return res.status(400).json({
-            status: "error",
-            mensaje: "Faltan datos por enviar"
-        });
-    }
-       
+            return res.status(400).json({
+                status: "error",
+                mensaje: "Faltan datos por enviar"
+            });
+        }
+
 
         // Buscar y actualizar artículo
         const articuloActualizado = await Articulo.findOneAndUpdate(
@@ -282,16 +282,16 @@ const subir = async (req, res) => {
 
 //
 
-const imagen = (req, res) =>{
+const imagen = (req, res) => {
 
     let fichero = req.params.fichero;
 
-    let ruta_fisica = "./imagenes/articulos/"+fichero;
+    let ruta_fisica = "./imagenes/articulos/" + fichero;
 
-    fs.stat(ruta_fisica, (error,existe) => {
-        if(existe){
+    fs.stat(ruta_fisica, (error, existe) => {
+        if (existe) {
             return res.sendFile(path.resolve(ruta_fisica));
-        }else{
+        } else {
             return res.status(404).json({
                 status: "error",
                 mensaje: "la imagen no existe"
@@ -303,32 +303,41 @@ const imagen = (req, res) =>{
 
 const buscador = async (req, res) => {
 
+    try {
 
-    try{
+        // Sacar el string de búsqueda
+        let busqueda = req.params.busqueda;
 
+        // Find OR 
+        let articuloBuscado = await Articulo.find({
+            "$or": [
+                { "titulo": { "$regex": busqueda, "$options": "i" } },
+                { "contenido": { "$regex": busqueda, "$options": "i" } }
+            ]
+        }).sort({ fecha: -1 });
 
+        if(articuloBuscado.length === 0){
+            throw new error("no se ha encontrado  articulos");
+        }
 
-    } catch(error) {
+        // Devolver resultado
+        return res.status(200).json({
+            status: "success",
+            articulos: articuloBuscado
+        });
 
-        
+    } catch (error) {
+
+        return res.status(404).json({
+            status: "error",
+            mensaje: error.message || "No se han encontrado artículos"
+        });
+
     }
-    
-
-    //sacar el string debusqueda
-
-
-    //find OR 
-
-
-    // orden 
-
-
-    //ejecutar consulta
-
-
-    //devolver resultado
 
 }
+
+
 
 
 //modulo para exportar metodos 
