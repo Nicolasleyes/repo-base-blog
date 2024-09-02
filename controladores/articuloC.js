@@ -72,16 +72,11 @@ const listar = async (req, res) => {
         // Ejecuta la consulta usando await y ordena por fecha descendente
         let consulta = Articulo.find({});
 
-
         if (req.params.ultimos) {
             consulta.limit(3);
         }
 
-
-
         consulta.sort({ fecha: -1 });
-
-
 
         const articulos = await consulta;
 
@@ -93,13 +88,14 @@ const listar = async (req, res) => {
             });
         }
 
-        // Si se encontraron artículos, responde con éxito
-        return res.status(200).json({
-            status: "success",
-
-            contador: articulos.length,
-            articulos
-        });
+        // Si quieres retrasar la respuesta, usa setTimeout aquí
+        setTimeout(() => {
+            return res.status(200).json({
+                status: "success",
+                contador: articulos.length,
+                articulos
+            });
+        }, 250); // Retraso de 2 segundos
 
     } catch (error) {
         // Manejo de errores en la consulta
@@ -109,6 +105,7 @@ const listar = async (req, res) => {
         });
     }
 };
+
 
 
 //metodo paraencontrar articulo por id

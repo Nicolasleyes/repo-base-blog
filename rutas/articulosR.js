@@ -2,7 +2,7 @@
 
  const multer = require("multer");
 
- const ArticuloControlador = require("../controladores/ArticuloC");
+ const ArticuloControlador = require("../controladores/articuloC");
 
  const router = express.Router();
 
