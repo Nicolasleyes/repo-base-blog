@@ -6,7 +6,8 @@ const mongoose = require("mongoose");
 const conexion = async() => {
     try{
 
-      await mongoose.connect("mongodb://localhost:27017/mi_blog");
+        await mongoose.connect("mongodb://localhost:27017/mi_blog");
+        
 
       console.log("conectado correctamente a la base de datos mi blog");
 
